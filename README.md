@@ -6,9 +6,9 @@ It is currently under development
 Code refactoring is required
 
 ## Requirement
-Packages and Python verion stated is for reference only
+Packages and Python version stated is for reference only
 
-Those are the verions that we've used while developing
+Those are the versions that we've used while developing
 
 You can try other versions if you want, but it might not work
 
