@@ -1,8 +1,11 @@
 # AtariBreakoutAI
-This is an university term project, currently under development.<br>
-Code refactoring is required.<br>
-<br>
-Reference :
+This program will play a custom made Atari Breakout.
+
+It is currently under development.
+
+Code refactoring is required.
+
+## Reference
 <ul>
 <li>Double DQN<br>https://arxiv.org/abs/1509.06461</li>
 <li>Prioritized Experience Replay<br>https://arxiv.org/abs/1511.05952</li>
