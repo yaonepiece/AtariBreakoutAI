@@ -26,6 +26,7 @@ You can try other versions if you want, but it might not work
 * How to install TensorFlow GPU version on Windows?<br>(English) https://youtu.be/r7-WPbx8VuY
 
 ## Reference
-* Double DQN<br>https://arxiv.org/abs/1509.06461</li>
-* Prioritized Experience Replay<br>https://arxiv.org/abs/1511.05952</li>
-* Dueling Network Architectures for Deep Reinforcement Learning<br>https://arxiv.org/abs/1511.06581</li>
+* Double DQN<br>https://arxiv.org/abs/1509.06461
+* Prioritized Experience Replay<br>https://arxiv.org/abs/1511.05952
+* Dueling Network Architectures for Deep Reinforcement Learning<br>https://arxiv.org/abs/1511.06581
+* Asynchronous Advantage Actor-Critic<br>https://arxiv.org/pdf/1602.01783.pdf
