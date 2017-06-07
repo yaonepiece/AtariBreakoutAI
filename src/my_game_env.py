@@ -273,7 +273,7 @@ class Atarigame:
 
 if __name__ == '__main__':
     # Game start
-    atari = Atarigame(speed=1,brickx=16,bricky=5,white=True,banner=True)
+    atari = Atarigame(speed=1,brickx=16,bricky=5,white=False,banner=True)
     end = False
     while True:
         # getkey
