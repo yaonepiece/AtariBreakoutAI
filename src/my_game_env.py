@@ -107,7 +107,10 @@ class Atarigame:
 
     def draw(self):
         self.surface.fill(colors.Black)
-        pygame.draw.circle(self.surface, colors.Red, tuple(self.ballPos.astype(int)), self.ballSize)
+        if self.white:
+            pygame.draw.circle(self.surface, colors.White, tuple(self.ballPos.astype(int)), self.ballSize)
+        else:
+            pygame.draw.circle(self.surface, colors.Red, tuple(self.ballPos.astype(int)), self.ballSize)
         for i in range(self.bricky):
             for j in range(self.brickx):
                 if self.brick[i][j] == 1:
