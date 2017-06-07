@@ -1,19 +1,21 @@
-import pygame, sys, time, colors
+import pygame, sys, time
+import colors
 from math import cos, sin, pi
 import numpy as np
 from sklearn.preprocessing import normalize as norm
 
 
 class Atarigame:
-    def __init__(self):
+    def __init__(self, speed=1, brickx=8,bricky=5,white=False,banner=False):
         # basic datas
         self.windowWidth = 400
         self.windowHeight = 300
-        self.runspeed = 1
+        self.runspeed = speed
         self.fps = 50
         self.fpsClock = pygame.time.Clock()
-        self.brick = np.ones((5, 8), dtype=int)
-        self.brickRect = [[pygame.Rect(50 * j, 20 * i + 40, 50, 20) for j in range(8)] for i in range(5)]
+        self.brickx, self.bricky=brickx, bricky
+        self.brick = np.ones((bricky, brickx), dtype=int)
+        self.brickRect = [[pygame.Rect(self.windowWidth * j // brickx, 20 * i + 40,  (self.windowWidth * (j+1) // brickx)-(self.windowWidth * j // brickx), 20) for j in range(brickx)] for i in range(bricky)]
         self.brickstatus = np.zeros((8), dtype=float)
         self.ballPos = np.array([200.0, 200.0])
         self.ballSpeed = 5
@@ -30,8 +32,13 @@ class Atarigame:
         self.barMove = 0
         self.start = True
         self.end = False
+        self.white=white
+        self.banner=banner
 
         self.ballrand()
+        pygame.init()
+        self.surface = pygame.display.set_mode((self.windowWidth, self.windowHeight))
+        pygame.display.set_caption('Atari Breakout')
 
     def getBrick(self):
         for i in range(8):
@@ -42,44 +49,53 @@ class Atarigame:
                     self.brickstatus[j] = (i + 1) * 0.2
                     break
 
-    def die(self, surface):
-        self.draw(surface)
+    def die(self):
+        self.draw()
         fontsize = 50
         font = pygame.font.SysFont(None, fontsize)
 
-        text = font.render('You lose!', 1, colors.White)
+        if self.white:
+            text = font.render('You lose!', 1, colors.Orange)
+        else:
+            text = font.render('You lose!', 1, colors.White)
         textRect = text.get_rect()  # Set the center of the text box
-        textRect.centerx = surface.get_rect().centerx
-        textRect.centery = surface.get_rect().centery
-        surface.blit(text, textRect)
+        textRect.centerx = self.surface.get_rect().centerx
+        textRect.centery = self.surface.get_rect().centery
+        self.surface.blit(text, textRect)
         pygame.display.update()
 
-    def gameclear(self, surface):
-        self.draw(surface)
+    def gameclear(self):
+        self.draw()
         fontsize = 50
         font = pygame.font.SysFont(None, fontsize)
 
-        text = font.render('You win!', 1, colors.White)
+        if self.white:
+            text = font.render('You win!', 1, colors.Orange)
+        else:
+            text = font.render('You win!', 1, colors.White)
         textRect = text.get_rect()  # Set the center of the text box
-        textRect.centerx = surface.get_rect().centerx
-        textRect.centery = surface.get_rect().centery
-        surface.blit(text, textRect)
+        textRect.centerx = self.surface.get_rect().centerx
+        textRect.centery = self.surface.get_rect().centery
+        self.surface.blit(text, textRect)
         pygame.display.update()
 
-    def timesup(self, surface):
-        self.draw(surface)
+    def timesup(self):
+        self.draw()
         fontsize = 50
         font = pygame.font.SysFont(None, fontsize)
 
-        text = font.render('Time\'s up!', 1, colors.White)
+        if self.white:
+            text = font.render('Time\'s up!', 1, colors.Orange)
+        else:
+            text = font.render('Time\'s up!', 1, colors.White)
         textRect = text.get_rect()  # Set the center of the text box
-        textRect.centerx = surface.get_rect().centerx
-        textRect.centery = surface.get_rect().centery
-        surface.blit(text, textRect)
+        textRect.centerx = self.surface.get_rect().centerx
+        textRect.centery = self.surface.get_rect().centery
+        self.surface.blit(text, textRect)
         pygame.display.update()
 
     def restart(self):
-        self.brick = np.ones((5, 8), dtype=int)
+        self.brick = np.ones((self.bricky, self.brickx), dtype=int)
         self.ballPos = np.array([200.0, 200.0])
         self.ballrand()
         self.barRect = pygame.Rect(self.barinitX - self.barLength // 2, self.barinitY - self.barWidth // 2,
@@ -89,38 +105,42 @@ class Atarigame:
         self.start = True
         self.end = False
 
-    def draw(self, surface):
-        surface.fill(colors.Black)
-        pygame.draw.circle(surface, colors.Red, tuple(self.ballPos.astype(int)), self.ballSize)
-        for i in range(5):
-            for j in range(8):
+    def draw(self):
+        self.surface.fill(colors.Black)
+        pygame.draw.circle(self.surface, colors.Red, tuple(self.ballPos.astype(int)), self.ballSize)
+        for i in range(self.bricky):
+            for j in range(self.brickx):
                 if self.brick[i][j] == 1:
-                    if (i + j) % 2 == 0:
-                        rectcolor = colors.Orange
+                    if not self.white:
+                        if (i + j) % 2 == 0:
+                            rectcolor = colors.Orange
+                        else:
+                            rectcolor = colors.Blue
                     else:
-                        rectcolor = colors.Blue
-                    pygame.draw.rect(surface, rectcolor, self.brickRect[i][j])
-        pygame.draw.rect(surface, colors.White, self.barRect)
+                        rectcolor = colors.White
+                    pygame.draw.rect(self.surface, rectcolor, self.brickRect[i][j])
+        pygame.draw.rect(self.surface, colors.White, self.barRect)
         pygame.display.update()
 
-    def startpause(self, surface):
+    def startpause(self):
         fontsize = 50
         font = pygame.font.SysFont(None, fontsize)
 
-        self.draw(surface)
+        self.draw()
         text = font.render('Ready?', 1, colors.White)
         textRect = text.get_rect()  # Set the center of the text box
-        textRect.centerx = surface.get_rect().centerx
-        textRect.centery = surface.get_rect().centery
-        surface.blit(text, textRect)
+        textRect.centerx = self.surface.get_rect().centerx
+        textRect.centery = self.surface.get_rect().centery
+        self.surface.blit(text, textRect)
         pygame.display.update()
-        time.sleep(0.5)
+        time.sleep(0.3)
 
     def ballrand(self):
         angle = (np.random.rand() * 0.5 + 1.27) * pi
         self.ballVector = np.array([cos(angle), sin(angle)])
 
     def ballMove(self):
+        reward=0.01
         # move
         prePos = np.copy(self.ballPos)
         self.ballPos += self.ballSpeed * self.ballVector
@@ -129,41 +149,37 @@ class Atarigame:
         if self.ballPos[0] <= self.ballSize:
             self.ballPos[0] = float(self.ballSize)
             self.ballVector[0] *= -1
-        elif self.ballPos[0] >= (400.0 - self.ballSize):
-            self.ballPos[0] = 400.0 - self.ballSize
+        elif self.ballPos[0] >= (self.windowWidth - self.ballSize):
+            self.ballPos[0] = self.windowWidth - self.ballSize
             self.ballVector[0] *= -1
         if self.ballPos[1] <= self.ballSize:
             self.ballPos[1] = float(self.ballSize)
             self.ballVector[1] *= -1
-        elif self.ballPos[1] >= (300.0 - self.ballSize):
-            return True
+        elif self.ballPos[1] >= (self.windowHeight - self.ballSize):
+            return True, -5
 
         # breakbrick
-        for i in range(5):
-            for j in range(8):
+        for i in range(self.bricky):
+            for j in range(self.brickx):
                 if self.brick[i][j] == 1:
                     # touch from right
-                    if self.ballPos[0] <= (j * 50 + self.ballSize + 50) and self.ballPos[0] > (
-                                j * 50 - self.ballSize + 50) and prePos[0] > self.ballPos[0] and self.ballPos[1] >= (
-                            20 * i + 40) and self.ballPos[1] < (20 * i + 60):
+                    if self.ballPos[0] <= (self.brickRect[i][j].right + self.ballSize) and self.ballPos[0] > (
+                                self.brickRect[i][j].right - self.ballSize) and prePos[0] > self.ballPos[0] and self.ballPos[1] >= self.brickRect[i][j].top and self.ballPos[1] < self.brickRect[i][j].bottom:
                         self.ballVector[0] *= -1
                         self.brick[i][j] = 0
                     # touch from left
-                    if self.ballPos[0] >= (j * 50 - self.ballSize) and self.ballPos[0] < (j * 50 + self.ballSize) and \
-                                    prePos[0] < self.ballPos[0] and self.ballPos[1] >= (20 * i + 40) and self.ballPos[
-                        1] < (20 * i + 60):
+                    if self.ballPos[0] >= (self.brickRect[i][j].left - self.ballSize) and self.ballPos[0] < (self.brickRect[i][j].right + self.ballSize) and \
+                                    prePos[0] < self.ballPos[0] and self.ballPos[1] >= self.brickRect[i][j].top and self.ballPos[1] < self.brickRect[i][j].bottom:
                         self.ballVector[0] *= -1
                         self.brick[i][j] = 0
                     # touch from bottom
-                    if self.ballPos[1] <= (i * 20 + self.ballSize + 60) and self.ballPos[1] > (
-                                i * 20 - self.ballSize + 60) and prePos[1] > self.ballPos[1] and self.ballPos[0] >= (
-                        50 * j) and self.ballPos[0] < (50 * j + 50):
+                    if self.ballPos[1] <= (self.brickRect[i][j].bottom + self.ballSize) and self.ballPos[1] > (
+                                self.brickRect[i][j].bottom - self.ballSize) and prePos[1] > self.ballPos[1] and self.ballPos[0] >= self.brickRect[i][j].left and self.ballPos[0] < self.brickRect[i][j].right:
                         self.ballVector[1] *= -1
                         self.brick[i][j] = 0
                     # touch from top
-                    if self.ballPos[1] >= (i * 20 - self.ballSize + 40) and self.ballPos[1] < (
-                                i * 20 + self.ballSize + 40) and prePos[1] < self.ballPos[1] and self.ballPos[0] >= (
-                        50 * j) and self.ballPos[0] < (50 * j + 50):
+                    if self.ballPos[1] >= (self.brickRect[i][j].top - self.ballSize) and self.ballPos[1] < (
+                                self.brickRect[i][j].top + self.ballSize) and prePos[1] < self.ballPos[1] and self.ballPos[0] >= self.brickRect[i][j].left and self.ballPos[0] < self.brickRect[i][j].right:
                         self.ballVector[1] *= -1
                         self.brick[i][j] = 0
 
@@ -181,13 +197,14 @@ class Atarigame:
                     tmpVector += norm(np.array([[0.95, -0.3]])).ravel() - tmpVector
                 else:
                     tmpVector += norm(np.array([[-0.95, -0.3]])).ravel() - tmpVector
+            reward=0.1
 
         self.ballVector = tmpVector
 
         if np.sum(self.brick) > 0:
-            return False
+            return False, reward
         else:
-            return True
+            return True, 20
 
     def moveBar(self):
         self.barRect.left += self.barSpeed * self.barMove
@@ -196,22 +213,28 @@ class Atarigame:
         if self.barRect.left <= 0:
             self.barRect.left = 0
 
-    def render(self, surface, move=0):
+    def render(self, move=0):
+        terminal=False
         # startPause
         if self.start:
-            self.startpause(surface)
+            if self.banner:
+                self.startpause()
             self.start = False
 
         # clearScreen
-        surface.fill(colors.Black)
+        self.surface.fill(colors.Black)
 
         # draw things
-        self.draw(surface)
+        self.draw()
 
         # update
         self.barMove = move
         self.moveBar()
-        self.end = self.ballMove()
+        preb=np.sum(self.brick)
+        self.end, reward = self.ballMove()
+        aftb=np.sum(self.brick)
+        if not end and aftb<preb:
+            reward=preb-aftb
 
         # time step
         self.ticks += 1
@@ -219,28 +242,32 @@ class Atarigame:
             self.seconds, self.ticks = self.seconds + 1, 0
         if self.seconds == 180:
             self.end = True
-            self.timesup(surface)
-            return True
-
-        # check gameover
-        if self.end:
-            if np.sum(self.brick) > 0:
-                self.die(surface)
+            if self.banner:
+                self.timesup()
             else:
-                self.gameclear(surface)
-            return True
+                self.restart()
+
+            terminal=True
+        # check gameover
+        elif self.end:
+            if self.banner:
+                if np.sum(self.brick) > 0:
+                    self.die()
+                else:
+                    self.gameclear()
+            else:
+                self.restart()
+            terminal=True
 
         pygame.event.clear()
         pygame.display.update()
-        return False
+        image_data = pygame.surfarray.array3d(pygame.display.get_surface())
+        return image_data, reward, terminal
 
 
 if __name__ == '__main__':
     # Game start
-    atari = Atarigame()
-    pygame.init()
-    surface = pygame.display.set_mode((atari.windowWidth, atari.windowHeight))
-    pygame.display.set_caption('Atari Breakout')
+    atari = Atarigame(speed=2,brickx=16,bricky=5,white=True)
     end = False
     while True:
         # getkey
@@ -255,10 +282,11 @@ if __name__ == '__main__':
         else:
             move = 0
 
-        end = atari.render(surface,move=move)
+        screen, reward, end = atari.render(move=move)
+        print(reward)
 
         if end:
-            time.sleep(1.5)
+            time.sleep(0.5)
             atari.restart()
         else:
             atari.fpsClock.tick(atari.fps * atari.runspeed)
