@@ -55,7 +55,7 @@ class Atarigame:
         font = pygame.font.SysFont(None, fontsize)
 
         if self.white:
-            text = font.render('You lose!', 1, colors.Orange)
+            text = font.render('You lose!', 1, colors.Red)
         else:
             text = font.render('You lose!', 1, colors.White)
         textRect = text.get_rect()  # Set the center of the text box
@@ -70,7 +70,7 @@ class Atarigame:
         font = pygame.font.SysFont(None, fontsize)
 
         if self.white:
-            text = font.render('You win!', 1, colors.Orange)
+            text = font.render('You win!', 1, colors.Red)
         else:
             text = font.render('You win!', 1, colors.White)
         textRect = text.get_rect()  # Set the center of the text box
@@ -85,7 +85,7 @@ class Atarigame:
         font = pygame.font.SysFont(None, fontsize)
 
         if self.white:
-            text = font.render('Time\'s up!', 1, colors.Orange)
+            text = font.render('Time\'s up!', 1, colors.Red)
         else:
             text = font.render('Time\'s up!', 1, colors.White)
         textRect = text.get_rect()  # Set the center of the text box
@@ -127,7 +127,10 @@ class Atarigame:
         font = pygame.font.SysFont(None, fontsize)
 
         self.draw()
-        text = font.render('Ready?', 1, colors.White)
+        if self.white:
+            text = font.render('Ready?', 1, colors.Red)
+        else:
+            text = font.render('Ready?', 1, colors.White)
         textRect = text.get_rect()  # Set the center of the text box
         textRect.centerx = self.surface.get_rect().centerx
         textRect.centery = self.surface.get_rect().centery
@@ -267,7 +270,7 @@ class Atarigame:
 
 if __name__ == '__main__':
     # Game start
-    atari = Atarigame(speed=2,brickx=16,bricky=5,white=True)
+    atari = Atarigame(speed=1,brickx=16,bricky=5,white=True,banner=True)
     end = False
     while True:
         # getkey
@@ -283,7 +286,6 @@ if __name__ == '__main__':
             move = 0
 
         screen, reward, end = atari.render(move=move)
-        print(reward)
 
         if end:
             time.sleep(0.5)
