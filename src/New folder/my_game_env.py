@@ -5,8 +5,8 @@ import numpy as np
 from sklearn.preprocessing import normalize as norm
 
 class colors(Enum):
-	Black=(0,0,0)
-	Blue=(0,100,255)
+	Balck=(0,0,0)
+	Blue(0,100,255)
 	Orange=(255,180,70)
 	Red=(255,0,0)
 	White=(255,255,255)
@@ -114,23 +114,23 @@ class Atarigame:
 		self.end = False
 
 	def draw(self):
-		self.surface.fill(colors.Black.value)
+		self.surface.fill(colors.Black)
 		if self.white:
-			pygame.draw.circle(self.surface, colors.White.value, tuple(self.ballPos.astype(int)), self.ballSize)
+			pygame.draw.circle(self.surface, colors.White, tuple(self.ballPos.astype(int)), self.ballSize)
 		else:
-			pygame.draw.circle(self.surface, colors.Red.value, tuple(self.ballPos.astype(int)), self.ballSize)
+			pygame.draw.circle(self.surface, colors.Red, tuple(self.ballPos.astype(int)), self.ballSize)
 		for i in range(self.bricky):
 			for j in range(self.brickx):
 				if self.brick[i][j] == 1:
 					if not self.white:
 						if (i + j) % 2 == 0:
-							rectcolor = colors.Orange.value
+							rectcolor = colors.Orange
 						else:
-							rectcolor = colors.Blue.value
+							rectcolor = colors.Blue
 					else:
-						rectcolor = colors.White.value
+						rectcolor = colors.White
 					pygame.draw.rect(self.surface, rectcolor, self.brickRect[i][j])
-		pygame.draw.rect(self.surface, colors.White.value, self.barRect)
+		pygame.draw.rect(self.surface, colors.White, self.barRect)
 		pygame.display.update()
 
 	def startpause(self):
@@ -170,7 +170,7 @@ class Atarigame:
 			self.ballPos[1] = float(self.ballSize)
 			self.ballVector[1] *= -1
 		elif self.ballPos[1] >= (self.windowHeight - self.ballSize):
-			return True, -2
+			return True, -1
 
 		# breakbrick
 		for i in range(self.bricky):
@@ -237,6 +237,9 @@ class Atarigame:
 			if self.banner:
 				self.startpause()
 			self.start = False
+
+		# clearScreen
+		self.surface.fill(colors.Black)
 
 		# draw things
 		self.draw()
